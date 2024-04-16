@@ -1,0 +1,278 @@
+﻿@model TicketMusic.Models.ProductsViewModel.ProductsViewAdmin
+@using System.Text.Json;
+<h2 class="mb-5">Sửa vé @Model.ProductsEdit.Name</h2>
+
+<div class="row" id="vue_edit">
+    <div class="col-6">
+        <div class="mb-3">
+            <label class="form-label">Tên vé </label>
+            <input class="form-control" value="@Model.ProductsEdit.Name" type="text" placeholder="Tên vé" id="Name">
+            <input class="form-control" value="@Model.ProductsEdit.IDProduct" type="hidden"  id="IDProduct">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Slug</label>
+            <input class="form-control" value="@Model.ProductsEdit.Slug" type="text" id="Slug" placeholder="Slug được tạo tự động" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Mô tả ngắn</label>
+            <textarea class="form-control" id="ShortDescription" rows="5" placeholder="Nhập mô tả">@Model.ProductsEdit.ShortDescription</textarea>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="mb-3">
+            <label class="form-label">Danh mục</label>
+            <select id="CategoryId" class="form-control">
+                @foreach (var category in Model.CategoriesList)
+                {
+                    var selected = category.CategoryID == Model.ProductsEdit.CategoryID ? "selected" : "";
+                    <option key="@category.CategoryID" value="@category.CategoryID" selected="@selected">
+                        @category.CategoryName
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Thời gian diễn ra</label>
+            <input class="form-control" type="datetime-local" id="TimeEvent" value="@Model.ProductsEdit.TimeEvent.ToString("yyyy-MM-ddTHH:mm")" />
+
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Địa điểm</label>
+            <input class="form-control" type="text" placeholder="Thanh Xuân, Hà Nội" id="Location" value="@Model.ProductsEdit.Location ">
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="mb-3">
+            <div class="d-flex variants">
+                <label class="form-label">Các biến thể vé</label>
+                <div class="add-plus" v-on:click="addVariants">
+                    <i class="fa-solid fa-plus"></i>
+
+                </div>
+            </div>
+
+            <div class="border-variants">
+
+                <div class="row" v-for="(items,index) in dataVariants" :key="index">
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <label class="form-label">Tên biến thể</label>
+                            <input class="form-control" type="text" placeholder="Vé trẻ em" v-model="items.VariantsValue">
+                        </div>
+                    </div>
+                    <div class="col-5">
+                        <div class="mb-3">
+                            <label class="form-label">Giá biến thể</label>
+                            <input class="form-control" type="text" placeholder="100000" v-model="items.PriceVariants">
+                        </div>
+                    </div>
+                    <div class="col-1">
+                        <div class="remove-items" v-on:click="removeWill(index,items)">
+                            <i class="fa-solid fa-xmark"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="mb-3">
+            <label class="form-label">Mô tả chi tiết</label>
+            <textarea id="editor"></textarea>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="mb-3">
+            <div class="form-label"> Ảnh đang có </div>
+            <img src="@Model.ProductsEdit.ImageEvent" alt="" style="width: 100%;height: 400px;object-fit: contain;" />
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="mb-3">
+            <label for="formFileSm" class="form-label"> Đổi ảnh banner </label>
+            <input type="file" ref="PrPath" v-on:change="onFileChange" accept="image/*">
+
+        </div>
+        <div class="mb-3">
+            <div class="form-label"> Ảnh xem trước </div>
+            <img :src="previewImage" alt="" style="width: 100%;height: 400px;object-fit: contain;" />
+        </div>
+    </div>
+    <div class="cover_order_fix_bot">
+        <button class="order_fix_bot" id="saveButton">Sửa vé</button>
+    </div>
+</div>
+<script src="~/lib/config/config_ckeditor.js"></script>
+
+<script>
+    var editorData;
+
+    var vue_edit = new Vue({
+        el: "#vue_edit",
+        data:{
+            dataVariants: @Html.Raw(JsonSerializer.Serialize(Model.ProductsEdit.ProductVariants)),
+            imageFile: null,
+            previewImage: null,
+            uploadedImage: null,
+        },
+        mounted() {
+          
+            console.log(this.dataVariants);
+        },
+        methods:{
+            onFileChange(event) {
+                const allowedTypes = ["image/png", "image/jpeg", "image/svg+xml"];
+
+                const fileInput = event.target;
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    // No file selected
+                    return;
+                }
+
+                // Check file type
+                if (!allowedTypes.includes(file.type)) {
+                    alert("Chỉ chọn PNG hoặc JPG, SVG ");
+                    fileInput.value = ""; // Clear the file input
+                    return;
+                }
+                this.imageFile = event.target.files[0];
+                this.previewImage = URL.createObjectURL(this.imageFile);
+                this.uploadedImage = null;
+            },
+            addVariants() {
+                this.dataVariants.push({
+                    ProductVariantsID: 0,
+                    VariantsValue: "Vé",
+                    PriceVariants: "10000",
+                });
+
+            },
+            removeWill(index, items) {
+                if (items.ProductVariantsID != 0) {
+                    console.log(items.ProductVariantsID);
+                    $('#preloader').fadeIn();
+                    const formData = new FormData();
+                    formData.append('ID', items.ProductVariantsID);
+                    axios.post('/admin/products/remove/variants', formData,
+                        {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        }).then(res => {
+                            if(res.data.code === 200){
+                                this.dataVariants.splice(index, 1);
+                            }
+                        }).finally(() => {
+                            $('#preloader').fadeOut();
+                        });
+                }else{
+                    this.dataVariants.splice(index, 1);
+
+                }
+            },
+            async editProducts() {
+                if (this.dataVariants.length <= 0){
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Chưa có biến thể',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+
+                const dataVariantsJson = JSON.stringify(this.dataVariants);
+                $('#preloader').fadeIn();
+                try {
+                    const formData = new FormData();
+                    formData.append('IDProduct', $("#IDProduct").val());
+                    formData.append('Name', $("#Name").val());
+                    formData.append('Slug', $("#Slug").val());
+                    formData.append('CategoryId', $('#CategoryId').val());
+                    formData.append('ShortDescription', $('#ShortDescription').val());
+                    formData.append('Description', editorData);
+                    formData.append('TimeEvent', $('#TimeEvent').val());
+                    formData.append('Location', $('#Location').val());
+                    if (this.$refs.PrPath.files[0] != null){
+                        formData.append('PrPath', this.$refs.PrPath.files[0]);
+
+                    }
+                    formData.append('Variants', dataVariantsJson);
+                    await axios.post('/admin/products/update', formData,
+                        {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        }).then(res => {
+                            if (res.data.code === 200) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Thành công',
+                                    text: 'Đã lưu thành công',
+                                    confirmButtonText: 'OK'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.reload();
+
+                                    }
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi',
+                                    text: `${res.data.message}`,
+                                    confirmButtonText: 'OK'
+                                });
+                                return;
+
+                            }
+
+                        }).finally(() => {
+                            $('#preloader').fadeOut();
+                        });
+
+                } catch (error) {
+                    $('#preloader').fadeOut();
+
+                    console.error(error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Đã có lỗi xảy ra',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload();
+                        }
+                    });
+
+                }
+            },
+           
+        }
+    });
+    $(document).ready(function () {
+        let editor;
+
+        ClassicEditor
+            .create(document.querySelector('#editor'), {
+                extraPlugins: [MyCustomUploadAdapterPlugin]
+            })
+            .then(createdEditor => {
+                editor = createdEditor;
+                editor.setData('@Html.Raw(Model.ProductsEdit.Description)');
+                document.getElementById('saveButton').addEventListener('click', function () {
+                    editorData = editor.getData();
+                    console.log(editorData);
+                    vue_edit.editProducts();
+                });
+
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+</script>

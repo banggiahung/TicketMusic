@@ -1,0 +1,410 @@
+﻿@model TicketMusic.Models.ProductsViewModel.ProductsViewAdmin
+@{
+    var count = 1;
+}
+
+<h2 class="text-center mb-4">Quản lý các loại vé</h2>
+
+<div id="vue_products">
+    <div class="p-3">
+        <button type="button" class="btn btn-success p-2" data-bs-toggle="modal" data-bs-target="#addModal">
+            Thêm vé
+        </button>
+    </div>
+    <table id="table_products" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Tên vé</th>
+                <th>Danh mục</th>
+                <th>Địa điểm</th>
+                <th>Thời gian</th>
+                <th>Ngày tạo</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var items in Model.ProductsList)
+            {
+                <tr>
+                    <td>@(count++)</td>
+                    <td>@items.Name</td>
+                    <td>@items.Categories.CategoryName</td>
+                    <td>@items.Location</td>
+                    <td>@items.TimeEvent</td>
+                    <td>@items.CreateDate</td>
+                    <td style="width: fit-content">
+                        <a href="/admin/products/edit/@items.IDProduct" class="btn btn-warning">Sửa vé</a>
+                        <button type="button" class="btn btn-danger" v-on:click="getItemsByIdDelete(@items.IDProduct)">Xóa</button>
+                        <a href="#" target="_blank" class="btn btn-outline-info">Chi tiết</a>
+
+                    </td>
+                  
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-xl ">
+            <div class="modal-content ">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Thêm mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+                </div>
+                <div class="modal-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Tên vé </label>
+                                    <input class="form-control" type="text" placeholder="Tên vé"  id="Name">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Slug</label>
+                                    <input class="form-control" type="text" id="Slug" placeholder="Slug được tạo tự động" />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mô tả ngắn</label>
+                                    <textarea class="form-control" id="ShortDescription" rows="5" placeholder="Nhập mô tả"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Danh mục</label>
+                                    <select id="CategoryId" class="form-control">
+                                        @foreach (var category in Model.CategoriesList)
+                                        {
+                                            <option key="@category.CategoryID" value="@category.CategoryID">
+                                                @category.CategoryName
+                                            </option>
+                                        }
+
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Thời gian diễn ra</label>
+                                    <input class="form-control" type="datetime-local" id="TimeEvent" />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Địa điểm</label>
+                                    <input class="form-control" type="text" placeholder="Thanh Xuân, Hà Nội" id="Location">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <div class="d-flex variants">
+                                        <label class="form-label">Các biến thể vé</label>
+                                        <div class="add-plus" v-on:click="addVariants">
+                                            <i class="fa-solid fa-plus"></i>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="border-variants">
+
+                                    <div class="row" v-for="(items,index) in dataVariants" :key="index">
+                                        <div class="col-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Tên biến thể</label>
+                                                <input class="form-control" type="text" placeholder="Vé trẻ em" v-model="items.variantsValue">
+                                            </div>
+                                        </div>
+                                        <div class="col-5">
+                                            <div class="mb-3">
+                                                <label class="form-label">Giá biến thể</label>
+                                                <input class="form-control" type="text" placeholder="100000" v-model="items.priceVariants">
+                                            </div>
+                                        </div>
+                                        <div class="col-1">
+                                            <div class="remove-items" v-on:click="removeWill(index)">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Mô tả chi tiết</label>
+                                    <textarea id="editor"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                            <div class="mb-3">
+                                <label for="formFileSm" class="form-label"> Chọn ảnh banner </label>
+                                <input type="file" ref="PrPath" v-on:change="onFileChange" accept="image/*">
+
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-label"> Ảnh xem trước </div>
+                                <img :src="previewImage" alt="" style="width: 100%;height: 400px;object-fit: contain;" />
+                            </div>
+                            </div>
+                        </div>
+                   
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" id="saveButton" >Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/lib/config/config_ckeditor.js"></script>
+<script src="~/lib/config/datatableconfig.js"></script>
+<script>
+    var editorData;
+    var vue_products = new Vue({
+        el: "#vue_products",
+        data: {
+            dataVariants: [],
+            imageFile: null,
+            previewImage: null,
+            uploadedImage: null,
+        },
+        methods: {
+            onFileChange(event) {
+                const allowedTypes = ["image/png", "image/jpeg", "image/svg+xml"];
+
+                const fileInput = event.target;
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    // No file selected
+                    return;
+                }
+
+                // Check file type
+                if (!allowedTypes.includes(file.type)) {
+                    alert("Chỉ chọn PNG hoặc JPG, SVG ");
+                    fileInput.value = ""; // Clear the file input
+                    return;
+                }
+                this.imageFile = event.target.files[0];
+                this.previewImage = URL.createObjectURL(this.imageFile);
+                this.uploadedImage = null;
+            },
+            addVariants() {
+                this.dataVariants.push({
+                    productVariantsID: 0,
+                    variantsValue: "",
+                    priceVariants: "",
+                });
+
+            },
+            removeWill(index) {
+                this.dataVariants.splice(index, 1);
+            },
+            async addProducts() {
+                if (this.dataVariants.length <= 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Chưa có biến thể',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+                const dataVariantsJson = JSON.stringify(this.dataVariants);
+                $('#preloader').fadeIn();
+                try {
+                    const formData = new FormData();
+                    formData.append('Name', $("#Name").val());
+                    formData.append('Slug', $("#Slug").val());
+                    formData.append('CategoryId', $('#CategoryId').val());
+                    formData.append('ShortDescription', $('#ShortDescription').val());
+                    formData.append('Description', editorData);
+                    formData.append('TimeEvent', $('#TimeEvent').val());
+                    formData.append('Location', $('#Location').val());
+                    formData.append('PrPath', this.$refs.PrPath.files[0]);
+                    formData.append('Variants', dataVariantsJson);
+                    await axios.post('/admin/products/add', formData,
+                        {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        }).then(res => {
+                            if(res.data.code === 200){
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Thành công',
+                                    text: 'Đã lưu thành công',
+                                    confirmButtonText: 'OK'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.reload();
+
+                                    }
+                                });
+                            }else{
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi',
+                                    text: `${res.data.message}`,
+                                    confirmButtonText: 'OK'
+                                });
+                                return;
+                                   
+                            }
+                           
+                        }).finally(() => {
+                            $('#preloader').fadeOut();
+                        });
+
+                } catch (error) {
+                    $('#preloader').fadeOut();
+
+                    console.error(error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Đã có lỗi xảy ra',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload();
+                        }
+                    });
+
+                }
+            },
+            getItemsByIdDelete(Id){
+                Swal.fire({
+                    title: 'Xóa sản phẩm',
+                    text: 'Bạn có chắc chắn muốn xóa',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Không!!!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const formData = new FormData();
+                        formData.append('ID', Id);
+                        axios.post('/admin/products/remove', formData, {
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        }).then(response => {
+                            if(response.data.code == 200){
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Thành công',
+                                    text: 'Đã thành công',
+                                    confirmButtonText: 'OK',
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.reload();
+
+                                    }
+                                });
+                            }else{
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi',
+                                    text: 'Đã có lỗi xảy ra vui lòng thử lại',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                           
+
+                        }).catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi',
+                                text: 'Đã có lỗi xảy ra vui lòng thử lại',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    } else {
+                        return;
+                    }
+                });
+            }
+        }
+    });
+    $(document).ready(function () {
+        function convertToSlug(text) {
+            let str = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+            // Các thay thế cho ký tự tiếng Việt
+            const replacements = {
+                "đ": "d",
+                "Đ": "D"
+            };
+
+            // Thực hiện thay thế cho các ký tự tiếng Việt
+            for (let key in replacements) {
+                str = str.replace(new RegExp(key, 'g'), replacements[key]);
+            }
+
+            // Chuyển đổi thành slug
+            return str
+                .toLowerCase()
+                .replace(/ /g, '-')           
+                .replace(/[^\w-]+/g, '');   
+        }
+
+
+     
+        $('#Name').on('input', function () {
+          
+            var name = $(this).val();
+          
+            $('#Slug').val(convertToSlug(name));
+        });
+        $('#table_products').DataTable({
+            ...globalConfig.createDataTableConfig(),
+            'columnDefs': [{
+                'targets': [-1],
+                'orderable': false,
+            }],
+            searching: true,
+            iDisplayLength: 7,
+            "ordering": false,
+            lengthChange: false,
+            aaSorting: [[0, "desc"]],
+            aLengthMenu: [
+                [5, 10, 25, 50, 100, -1],
+
+                ["5 dòng", "10 dòng", "25 dòng", "50 dòng", "100 dòng", "Tất cả"],
+            ]
+        });
+        let editor;
+
+
+        document.querySelector('.btn-secondary').addEventListener('click', function (event) {
+            if (editor) {
+                editorData = editor.getData();
+
+                editor.setData('');
+
+                editor.destroy();
+            }
+        });
+
+        document.querySelector('.btn-success ').addEventListener('click', function (event) {
+            // Tái tạo lại trình soạn thảo
+            ClassicEditor
+                .create(document.querySelector('#editor'), {
+                    extraPlugins: [MyCustomUploadAdapterPlugin]
+                })
+                .then(createdEditor => {
+                    editor = createdEditor;
+                    document.getElementById('saveButton').addEventListener('click', function () {
+                        editorData = editor.getData();
+                        console.log(editorData);
+                        vue_products.addProducts();
+                    });
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+       
+
+    });
+</script>

@@ -1,0 +1,196 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TicketMusic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/TicketMusic.styles.css" asp-append-version="true" />
+
+
+    @RenderSection("Styles", required: false)
+
+</head>
+<body class="main-layout">
+    <div class="loading-main" id="loadingMore">
+        <div class="loading-background"></div>
+
+        <div class="u-loading">
+            <div class="u-loading__symbol">
+                <div class="spinner center">
+                    <div class="spinner-blade"></div>
+                    <div class="spinner-blade"></div>
+                    <div class="spinner-blade"></div>
+                    <div class="spinner-blade"></div>
+                    <div class="spinner-blade"></div>
+                    <div class="spinner-blade"></div>
+                    <div class="spinner-blade"></div>
+                    <div class="spinner-blade"></div>
+                    <div class="spinner-blade"></div>
+                    <div class="spinner-blade"></div>
+                    <div class="spinner-blade"></div>
+                    <div class="spinner-blade"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @await Component.InvokeAsync("HeaderMain")
+     
+    @RenderBody()
+      
+    @await Component.InvokeAsync("FooterMain")
+
+  
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.5/axios.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        $(document).ready(function () {
+            var header = $(".header-fix");
+
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 50) {
+                    header.addClass("fixed");
+                } else {
+                    header.removeClass("fixed");
+                }
+            });
+        })
+       
+    </script>
+    <script>
+
+        var vue_header = new Vue({
+            el: "#vue_header",
+            data: {
+                userName: '',
+                FullName: '',
+                PhoneNumber: '',
+                password: '',
+                ConfirmPassword: '',
+                mess: null,
+                PriceUser: 0,
+                userCheck: false,
+                RememberMe: true,
+                showPassword: false,
+                showRePassword: false,
+                showMainPassword: false,
+                Email: "",
+            },
+            computed: {
+                inputType() {
+                    return this.showPassword ? 'text' : 'password';
+                },
+                reType() {
+                    return this.showRePassword ? 'text' : 'password';
+                },
+                mainType() {
+                    return this.showMainPassword ? 'text' : 'password';
+                }
+            },
+            methods: {
+                togglePasswordVisibility() {
+                    this.showPassword = !this.showPassword;
+                },
+                togglePasswordRe() {
+                    this.showRePassword = !this.showRePassword;
+                },
+                togglePassword() {
+                    this.showMainPassword = !this.showMainPassword;
+                },
+                async postLogin() {
+                    $('#loadingMore').fadeIn();
+
+                    const formData = new FormData();
+
+                    formData.append('UserName', this.userName);
+                    formData.append('Password', this.password);
+                    formData.append('RememberMe', this.RememberMe);
+                    await axios.post('/tai-khoan/dang-nhap', formData)
+                        .then(res => {
+                            if (res.data.code == 200) {
+                                localStorage.removeItem("checkRes");
+                                localStorage.setItem('checkLog', res.data.section);
+                                window.location.reload();
+                            }
+                            else if (res.data.code == 208) {
+                                const hef = res.data.red;
+                                window.location.href = hef;
+                            }
+                            else if (res.data.code == 408) {
+                                this.mess = res.data.message;
+                                console.log(this.mess);
+
+                            } else {
+                                this.mess = res.data.message;
+                                console.log(this.mess);
+
+                            }
+                        }).finally(() => {
+                            $('#loadingMore').fadeOut();
+                        });
+                },
+                async postRes() {
+                    $('#loadingMore').fadeIn();
+
+                    const formData = new FormData();
+                    formData.append('PasswordHash', this.password);
+                    formData.append('ConfirmPassword', this.ConfirmPassword);
+                    formData.append('FullName', this.FullName);
+                    formData.append('UserName', this.userName);
+                    formData.append('PhoneNumber', this.PhoneNumber);
+                    formData.append('Email', this.Email);
+                    await axios.post('/tai-khoan/dang-ky-tai-khoan', formData)
+                        .then(res => {
+                            if (res.data.code == 200) {
+                                localStorage.setItem('checkRes', res.data.section);
+                                $("#modalRes").modal('hide');
+                                $("#modalLogin").modal('show');
+                            }
+                            else {
+                                this.mess = res.data.message;
+                                console.log(this.mess);
+                            }
+                        }).finally(() => {
+                            $('#loadingMore').fadeOut();
+                        });
+                },
+                Logout() {
+                    fetch("/dang-xuat", {
+                        method: "GET"
+                    })
+                        .then(res => {
+                            localStorage.removeItem("checkRes");
+                            localStorage.removeItem('checkLog');
+                            window.location.reload()
+                        })
+                }
+            }
+        });
+
+        $(document).ready(function () {
+            $("#btnLogin").click(function () {
+                $("#modalLogin").modal('show');
+            });
+            $("#btnSignup").click(function () {
+                $("#modalRes").modal('show');
+            });
+            $("#buttonRes").click(function () {
+                $("#modalLogin").modal('hide');
+                $("#modalRes").modal('show');
+            });
+            $("#buttonLog").click(function () {
+                $("#modalRes").modal('hide');
+                $("#modalLogin").modal('show');
+            });
+        })
+    </script>
+</body>
+</html>
