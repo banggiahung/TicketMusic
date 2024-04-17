@@ -1,0 +1,206 @@
+﻿@model List<TicketMusic.Models.ApplicationUser>
+@{
+    var count = 1;
+}
+<div id="vue_customer">
+    <h2 class="text-center">Quản lý người dùng</h2>
+    <div>
+        <table id="table_customer" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tên người dùng</th>
+                    <th>UserName</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Ngày tham gia</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var items in Model)
+                {
+                    <tr>
+                        <td>@(count++)</td>
+                        <td>@items.FullName</td>
+                        <td>@items.UserName</td>
+                        <td>@items.Email</td>
+                        <td>@items.PhoneNumber</td>
+                        <td>@items.CreateDate.ToString("dd/mm/yyyy")</td>
+                        <td>
+                            @if (items.IsActive)
+                            {
+                                <button class="btn btn-success" v-on:click="handleActive(@items.Id)">Hoạt động</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-outline-info" v-on:click="handleActive(@items.Id)">Không hoạt động</button>
+
+                            }
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger" v-on:click="getItemsByIdDelete(@items.Id)">Xóa</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+   
+</div>
+
+<script src="~/lib/config/datatableconfig.js"></script>
+
+<script>
+    var vue_customer = new Vue({
+        el: "#vue_customer",
+        data: {
+
+        },
+        methods:{
+            getItemsByIdDelete(Id) {
+                Swal.fire({
+                    title: 'Xóa người dùng',
+                    text: 'Khi xóa sẽ xóa hết dữ liệu người dùng đó',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Không!!!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const formData = new FormData();
+                        formData.append('userId', Id);
+                        axios.post('/admin/customer/remove-user', formData, {
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        }).then(response => {
+                            if (response.data.code == 200) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Thành công',
+                                    text: 'Đã thành công',
+                                    confirmButtonText: 'OK',
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.reload();
+
+                                    }
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi',
+                                    text: `${res.data.message}`,
+                                    confirmButtonText: 'OK'
+                                });
+                                return;
+                            }
+
+
+                        }).catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi',
+                                text: 'Đã có lỗi xảy ra vui lòng thử lại',
+                                confirmButtonText: 'OK'
+                            });
+                            return;
+
+                        });
+                    } else {
+                        return;
+                    }
+                });
+            },
+            handleActive(ID) {
+                try {
+                    const formData = new FormData();
+                    formData.append('userId', ID);
+                    axios.post('/admin/customer/change-active', formData, {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+
+                    }).then(res => {
+                        if (res.data.code == 200) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công',
+                                text: 'Đã thành công',
+                                confirmButtonText: 'OK'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Cảnh báo',
+                                text: `${res.data.message}`,
+                                confirmButtonText: 'OK'
+                            });
+                            return;
+                        }
+                    })
+
+                } catch {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Lỗi',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload();
+                        }
+                    });
+                }
+            }
+        }
+    });
+    $(document).ready(function () {
+        $('#table_customer').DataTable({
+            ...globalConfig.createDataTableConfig(),
+            'columnDefs': [{
+                'targets': [-1],
+                'orderable': false,
+            }],
+            searching: true,
+            iDisplayLength: 7,
+            "ordering": false,
+            lengthChange: false,
+            aaSorting: [[0, "desc"]],
+            aLengthMenu: [
+                [5, 10, 25, 50, 100, -1],
+
+                ["5 dòng", "10 dòng", "25 dòng", "50 dòng", "100 dòng", "Tất cả"],
+            ]
+        });
+
+        function convertToSlug(text) {
+            let str = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+            // Các thay thế cho ký tự tiếng Việt
+            const replacements = {
+                "đ": "d",
+                "Đ": "D"
+            };
+
+            // Thực hiện thay thế cho các ký tự tiếng Việt
+            for (let key in replacements) {
+                str = str.replace(new RegExp(key, 'g'), replacements[key]);
+            }
+
+            // Chuyển đổi thành slug
+            return str
+                .toLowerCase()
+                .replace(/ /g, '-')
+                .replace(/[^\w-]+/g, '');
+        }
+
+       
+    })
+</script>

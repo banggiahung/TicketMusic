@@ -20,6 +20,7 @@
                 <th>Địa điểm</th>
                 <th>Thời gian</th>
                 <th>Ngày tạo</th>
+                <th>Hiển thị</th>
                 <th></th>
             </tr>
         </thead>
@@ -33,10 +34,22 @@
                     <td>@items.Location</td>
                     <td>@items.TimeEvent</td>
                     <td>@items.CreateDate</td>
+                    <td>
+                        @if (items.IsPopular)
+                        {
+                            <button type="button" class="btn btn-success" v-on:click="changePopular(@items.IDProduct)">Phổ biến</button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-primary" v-on:click="changePopular(@items.IDProduct)">Không phổ biến</button>
+
+                        }
+                            
+
+                    </td>
                     <td style="width: fit-content">
                         <a href="/admin/products/edit/@items.IDProduct" class="btn btn-warning">Sửa vé</a>
                         <button type="button" class="btn btn-danger" v-on:click="getItemsByIdDelete(@items.IDProduct)">Xóa</button>
-                        <a href="#" target="_blank" class="btn btn-outline-info">Chi tiết</a>
 
                     </td>
                   
@@ -55,6 +68,14 @@
                 <div class="modal-body">
                         <div class="row">
                             <div class="col-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"  id="IsPopular">
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Phổ biến
+                                    </label>
+                                </div>
+                            </div>
                                 <div class="mb-3">
                                     <label class="form-label">Tên vé </label>
                                     <input class="form-control" type="text" placeholder="Tên vé"  id="Name">
@@ -104,7 +125,7 @@
                                     <div class="border-variants">
 
                                     <div class="row" v-for="(items,index) in dataVariants" :key="index">
-                                        <div class="col-6">
+                                        <div class="col-5">
                                             <div class="mb-3">
                                                 <label class="form-label">Tên biến thể</label>
                                                 <input class="form-control" type="text" placeholder="Vé trẻ em" v-model="items.variantsValue">
@@ -114,6 +135,12 @@
                                             <div class="mb-3">
                                                 <label class="form-label">Giá biến thể</label>
                                                 <input class="form-control" type="text" placeholder="100000" v-model="items.priceVariants">
+                                            </div>
+                                        </div>
+                                        <div class="col-1">
+                                            <div class="mb-3">
+                                                <label class="form-label">Số lượng vé</label>
+                                                <input class="form-control" type="text" placeholder="1" v-model="items.quantityTicket">
                                             </div>
                                         </div>
                                         <div class="col-1">
@@ -191,8 +218,9 @@
             addVariants() {
                 this.dataVariants.push({
                     productVariantsID: 0,
-                    variantsValue: "",
-                    priceVariants: "",
+                    variantsValue: "Vé",
+                    priceVariants: "100000",
+                    quantityTicket: 1,
                 });
 
             },
@@ -212,8 +240,10 @@
                 const dataVariantsJson = JSON.stringify(this.dataVariants);
                 $('#preloader').fadeIn();
                 try {
+                    const isPopular = $("#IsPopular").prop("checked");
                     const formData = new FormData();
                     formData.append('Name', $("#Name").val());
+                    formData.append('IsPopular', isPopular);
                     formData.append('Slug', $("#Slug").val());
                     formData.append('CategoryId', $('#CategoryId').val());
                     formData.append('ShortDescription', $('#ShortDescription').val());
@@ -323,6 +353,51 @@
                         return;
                     }
                 });
+            },
+            changePopular(ID) {
+                try {
+                    const formData = new FormData();
+                    formData.append('ID', ID);
+                    axios.post('/admin/product/change-popular', formData, {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+
+                    }).then(res => {
+                        if (res.data.code == 200) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công',
+                                text: 'Đã thành công',
+                                confirmButtonText: 'OK'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Cảnh báo',
+                                text: `${res.data.message}`,
+                                confirmButtonText: 'OK'
+                            });
+                            return;
+                        }
+                    })
+
+                } catch {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Lỗi',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload();
+                        }
+                    });
+                }
             }
         }
     });

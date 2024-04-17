@@ -1,4 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace TicketMusic.Models
 {
@@ -12,6 +15,16 @@ namespace TicketMusic.Models
         public int Quantity { get; set; }
         public decimal ProductsPrice { get; set; }
 
+
+        [ForeignKey("ProductsVariants")]
         public virtual ProductVariants ProductVariants { get; set; }
+
+        [ForeignKey("ProductsID")]
+        public virtual Products Products { get; set; }
+
+        [ForeignKey("OrderID")]
+        [JsonIgnore]
+        [IgnoreDataMember]
+        public virtual Orders Orders { get; set; }
     }
 }

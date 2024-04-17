@@ -5,6 +5,7 @@
         public int ProductVariantsID { get; set; }
         public string VariantsValue { get; set; }
         public decimal PriceVariants { get; set; }
+        public int QuantityTicket { get; set; }
     }
 
 }

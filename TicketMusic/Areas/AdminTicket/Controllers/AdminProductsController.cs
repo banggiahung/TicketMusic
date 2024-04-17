@@ -37,6 +37,7 @@ namespace TicketMusic.Areas.AdminTicket.Controllers
         {
             var results = _context.Products.Include(x=>x.Categories)
                 .Include(x => x.ProductVariants)
+                .OrderByDescending(x=>x.IDProduct)
                 .ToList();
             var listCategory = _context.Categories.ToList();
 
@@ -107,6 +108,8 @@ namespace TicketMusic.Areas.AdminTicket.Controllers
                     variantItem.VariantsValue = item.variantsValue;
                     variantItem.PriceVariants = item.priceVariants;
                     variantItem.ProductID = products.IDProduct;
+                    variantItem.QuantityTicket = item.quantityTicket;
+
                     _context.Add(variantItem);
                 }
                 await _context.SaveChangesAsync();
@@ -239,6 +242,7 @@ namespace TicketMusic.Areas.AdminTicket.Controllers
                         variantItem.VariantsValue = item.VariantsValue;
                         variantItem.PriceVariants = item.PriceVariants;
                         variantItem.ProductID = products.IDProduct;
+                        variantItem.QuantityTicket = item.QuantityTicket;
                         _context.Add(variantItem);
                     }
                    
@@ -252,6 +256,32 @@ namespace TicketMusic.Areas.AdminTicket.Controllers
                 return Ok(new { code = 400, message = ex.Message });
             }
 
+
+        }
+        [HttpPost("admin/product/change-popular")]
+        public async Task<IActionResult> ChangePopular(int ID)
+        {
+            try
+            {
+
+                var existingProduct = await _context.Products.FirstOrDefaultAsync(x => x.IDProduct == ID);
+                if (existingProduct == null)
+                {
+                    return Ok(new { code = 400 });
+
+                }
+                existingProduct.IsPopular = !existingProduct.IsPopular;
+                _context.Update(existingProduct);
+                _context.SaveChanges();
+
+                return Ok(new { code = 200, meesage = "Thành công" });
+
+            }
+
+            catch (Exception ex)
+            {
+                return Ok(new { code = 500 });
+            }
 
         }
     }

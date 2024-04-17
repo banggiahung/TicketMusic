@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using System.Data;
 using TicketMusic.Data;
 using TicketMusic.Models;
+using TicketMusic.Models.ViewDashboard;
 using TicketMusic.Services;
 
 namespace TicketMusic.Areas.AdminTicket.Controllers
@@ -32,7 +33,20 @@ namespace TicketMusic.Areas.AdminTicket.Controllers
         [HttpGet("admin/dashboard")]
         public IActionResult Index()
         {
-            return View();
+            var totalPrice = _context.Orders.Where(x => x.OrderStatus).Sum(x => x.TotalPrices);
+
+            var user = _context.Users.Count();
+            var products = _context.Products.Count();
+            var category = _context.Categories.Count();
+
+            var response = new ViewDashBorad
+            {
+                TotalPrice = totalPrice,
+                TotalUser = user,
+                TotalCategory = category,
+                TotalTicket = products
+            };
+            return View(response);
         }
 
 

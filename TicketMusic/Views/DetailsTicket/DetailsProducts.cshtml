@@ -1,0 +1,465 @@
+﻿@model TicketMusic.Models.DetailsProductsView.DetailsProductView;
+@using System.Linq;
+@{
+    ViewData["Title"] = Model.Products.Name;
+}
+
+@section Styles{
+    <link href="~/css/details.css" rel="stylesheet" />
+}
+
+<div class="img-details-items">
+    <img class="w-100 img-fluid" src="@Model.Products.ImageEvent" alt="@Model.Products.Name" title="@Model.Products.Name" />
+</div>
+<main class="container" id="vue_order">
+    <div class="box-items" id="first-items">
+        <div class="row">
+            <div class="col-md-9 col-12">
+                <h2 id="event_name">@Model.Products.Name</h2>
+                <div class="event_info">
+                    <p class="d-flex align-items-center">
+                        <i class="fa-solid fa-clock"></i>
+                        <span>
+                            @Model.Products.TimeEvent.Hour:@Model.Products.TimeEvent.Minute
+                        </span>
+                    </p>
+                    <p class="d-flex align-items-center">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span>
+                            Ngày @Model.Products.TimeEvent.Day
+                            Tháng @Model.Products.TimeEvent.Month
+                            Năm @Model.Products.TimeEvent.Year
+                        </span>
+                    </p><p class="d-flex align-items-center">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>
+                            @Model.Products.Location
+                        </span>
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3 col-12">
+                <div class="cover_order_now">
+                    <a type="javascript" data-bs-toggle="modal" data-bs-target="#buyTicket" class="order_now order-button" href="javascript:void(0)">
+                        Mua ngay / Buy now <i class="fa-solid fa-paper-plane" aria-hidden="true">
+
+                        </i>
+                    </a>
+                </div>
+                <div id="social_button">
+                    <script src="//platform-api.sharethis.com/js/sharethis.js#property=5b5e8344d6d379001104b012&amp;product=inline-share-buttons"></script>
+                    <div class="sharethis-inline-share-buttons st-center  st-inline-share-buttons st-animated" id="st-1">
+                        <div class="st-total st-hidden">
+                            <span class="st-label"></span>
+                            <span class="st-shares">
+                                Shares
+                            </span>
+                        </div><div class="st-btn st-first" data-network="facebook" style="display: inline-block;">
+                            <img alt="facebook sharing button" src="https://platform-cdn.sharethis.com/img/facebook.svg">
+
+                        </div><div class="st-btn" data-network="twitter" style="display: inline-block;">
+                            <img alt="twitter sharing button" src="https://platform-cdn.sharethis.com/img/twitter.svg">
+
+                        </div><div class="st-btn" data-network="pinterest" style="display: inline-block;">
+                            <img alt="pinterest sharing button" src="https://platform-cdn.sharethis.com/img/pinterest.svg">
+
+                        </div><div class="st-btn" data-network="email" style="display: inline-block;">
+                            <img alt="email sharing button" src="https://platform-cdn.sharethis.com/img/email.svg">
+
+                        </div><div class="st-btn" data-network="sharethis" style="display: inline-block;">
+                            <img alt="sharethis sharing button" src="https://platform-cdn.sharethis.com/img/sharethis.svg">
+
+                        </div><div class="st-btn" data-network="messenger" style="display: inline-block;">
+                            <img alt="messenger sharing button" src="https://platform-cdn.sharethis.com/img/messenger.svg">
+
+                        </div><div class="st-btn st-last" data-network="linkedin" style="display: inline-block;">
+                            <img alt="linkedin sharing button" src="https://platform-cdn.sharethis.com/img/linkedin.svg">
+
+                        </div>
+                    </div>
+                </div>
+                <div id="contact_support">
+                    <p>Liên hệ bộ phận chăm sóc khách hàng</p>
+                    <p>Email: ticketgo.vn@gmail.com</p>
+                    <p>vui lòng gọi: <a href="tel:0899980818"><b>08.999.80.818</b></a> - <a href="tel:02437880099"><b>0243.788.00.99</b></a></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="box-items">
+        <h2 class="ticket_title">GIỚI THIỆU VỀ SỰ KIỆN</h2>
+        <div class="ticket_info_box">
+            @Html.Raw(Model.Products.Description)
+        </div>
+    </div>
+    <div class="box-items">
+        <h2 class="ticket_title">Thông tin mua vé</h2>
+        @foreach (var items in Model.Products.ProductVariants)
+        {
+            <div class="info-buy">
+                <div class="value-price">
+                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                    <p>@items.VariantsValue</p>
+                </div>
+                <div class="price">
+                    @items.PriceVariants.ToString("N0") VNĐ
+                </div>
+            </div>
+        }
+
+    </div>
+    @if (Model.ProductsList.Any())
+    {
+        <div class="box-items">
+            <h2 class="ticket_title">Sự kiện liên quan</h2>
+            <div class="row">
+                @foreach (var items in Model.ProductsList)
+                {
+                    <div class="col-12 col-md-3">
+                        <div class="cover_list_event">
+                            <div class="event">
+                                <a class="event_image" href="/event/@items.Slug" title="@items.Name">
+                                    <img src="@items.ImageEvent" alt="@items.Name" title="@items.Name">
+                                </a>
+
+                                <div class="event_date_time">
+                                    <div class="event_date_month"> Tháng @items.TimeEvent.Month </div>
+                                    <div class="event_date_day"> @items.TimeEvent.Day </div>
+                                    <div class="event_date_year"> @items.TimeEvent.Year </div>
+                                </div>
+                                <div class="sub_event">
+                                    <div>
+                                        <span class="fa fa-eye"></span>
+                                        @items.ViewCount.ToString("N0")
+                                    </div>
+                                    <div>
+                                        <span class="fa fa-map-marker"></span>
+                                        @{
+                                            string[] parts = items.Location?.Split(',');
+                                            string lastPart = parts[parts.Length - 1].Trim();
+                                        }
+                                        @lastPart
+                                        <span>+</span>
+                                    </div>
+                                    <div>
+                                        @{
+                                            decimal minPrice = items.ProductVariants.Min(v => v.PriceVariants);
+                                        }
+                                        <span>VNĐ</span> @minPrice.ToString("N0")
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h3>
+                                    <a href="/event/@items.Slug" title="@items.Name">@items.Name</a>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    }
+
+    <div class="cover_order_fix_bot">
+        <button class="order_fix_bot" id="saveButton" data-bs-toggle="modal" data-bs-target="#buyTicket">Mua ngay / Buy now <i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
+    </div>
+    <div class="modal fade" id="buyTicket" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 col-12">
+                            <div>
+                                @if (ViewBag.userName != null)
+                                {
+                                    <div class="title-border-left uppercase bold">Thông tin khách hàng </div>
+                                    <div class="clearfix clearfix-15"></div>
+                                    <div class="form-group">
+                                        <label>Họ tên: </label>
+                                        <input id="nameDetails" class="form-control" name="name" type="text" value="@Model.User.FullName">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Điện thoại: </label>
+                                        <input id="phoneDetails" class="form-control" name="phone" type="text" value="@Model.User.PhoneNumber">
+                                    </div>
+                                    <div class="cover-form-group">
+                                        <div class="form-group">
+                                            <label>Email: </label>
+                                            <input id="emailDetails" class="form-control" name="email" type="text" value="@Model.User.Email">
+                                        </div>
+                                    </div>
+                                    <div class="cover-form-group">
+                                        <div class="form-group">
+                                            <label>Địa chỉ:</label>
+                                            <input id="addressDetails" class="form-control" name="address" type="text" value="@Model.User.Address">
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div>
+                                        <p class="text-warning text-center">Vui lòng đăng nhập để mua vé<span class="text-danger">*</span></p>
+                                        <div class="login-main">
+                                            <div class="login-modal">
+                                                <button class="btn orange-background" id="login-modal">Đăng nhập</button>
+                                            </div>
+                                            <div class="login-modal">
+                                                <button class="btn orange-background" id="resgister-modal">Đăng ký</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                              
+                               
+                            </div>
+                            <div>
+                                <div class="title-border-left uppercase bold mt-4">LOẠI THANH TOÁN </div>
+                                <div class="accordion" id="accordionPanelsStayOpenExample">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                                                Chuyển khoản VnPay
+                                            </button>
+                                        </h2>
+                                        <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
+                                            <div class="accordion-body">
+                                                Sản phẩm điện tử sẽ được gửi ngay sau khi giao dịch thanh toán thành công. Sau khi chúng tôi xác nhận giao dịch chuyển khoản thành công.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="col-md-8 col-12">
+                            <div class="title-border-left uppercase bold">Thông tin vé </div>
+                            <div class="form-horizontal form-bordered-order">
+                                @foreach (var items in Model.Products.ProductVariants)
+                                {
+                                    <div class="form-group  mb-2">
+                                        <div class="row align-items-center items-variants">
+                                            <label for="" class="control-label col-md-6 col-9">
+                                                <span>
+                                                    @items.VariantsValue
+                                                </span>
+                                            </label>
+                                            <div class="col-3 div-label">@items.PriceVariants.ToString("N0") VNĐ</div>
+                                            <div class="col-3 p-30">
+                                                <div class="input-group bootstrap-touchspin">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-danger bootstrap-touchspin-down" type="button">-</button>
+                                                    </span>
+                                                    <input type="text" value="0" name="quantity" id="ticket_@items.ProductVariantsID" data-product-id="@items.ProductID" class="quant form-control" data-max="10" data-min="0" data-price="@items.PriceVariants" style="display: block;" readonly>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-info bootstrap-touchspin-up" type="button">+</button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                            </div>
+
+                            <div class="total-price">
+                                <table class="table table-hover table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <td>Tổng cộng / Total</td>
+                                            <td class="text-right">
+                                                <span id="total_number_ticket" class="orange-color uppercase bold" >0</span> 
+                                                <span class="orange-color uppercase bold"> VNĐ</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            @if (ViewBag.userName != null)
+                            {
+                                <div class="payment">
+                                    <button type="submit" id="ladda_button" class="btn btn-block orange-background ladda-button" data-style="expand-left">
+                                        <span class="ladda-label">Tiếp tục thanh toán </span>
+                                    </button>
+
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="payment">
+                                    <button type="submit" id="ladda_button" class="btn btn-block black-background ladda-button" data-style="expand-left">
+                                        <span class="ladda-label">Tiếp tục thanh toán </span>
+                                    </button>
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts{
+    <script>
+        var listProducts = [];
+        var totalPriceMain = 0;
+        $(window).scroll(function () {
+            var scrollPos = $(window).scrollTop();
+            var elementOffset = $('#first-items').offset().top;
+
+            if (scrollPos >= elementOffset) {
+                $('.cover_order_fix_bot').fadeIn();
+            } else {
+                $('.cover_order_fix_bot').fadeOut();
+            }
+        });
+        $(document).ready(function () {
+            $("#resgister-modal").click(function () {
+                $("#buyTicket").modal("hide");
+                $("#modalRes").modal("show");
+            });
+            $("#login-modal").click(function () {
+                $("#buyTicket").modal("hide");
+                $("#modalLogin").modal("show");
+            });
+            $(".bootstrap-touchspin-up").click(function () {
+                var inputField = $(this).closest(".bootstrap-touchspin").find("input[type='text']");
+                var currentValue = parseInt(inputField.val());
+                var maxValue = parseInt(inputField.data("max"));
+                if (currentValue < maxValue) {
+                    inputField.val(currentValue + 1);
+                    updateTotalPrice();
+                    updateListProducts(inputField);
+                }
+            });
+
+            $(".bootstrap-touchspin-down").click(function () {
+                var inputField = $(this).closest(".bootstrap-touchspin").find("input[type='text']");
+                var currentValue = parseInt(inputField.val());
+                var minValue = parseInt(inputField.data("min"));
+                if (currentValue > minValue) {
+                    inputField.val(currentValue - 1);
+                    updateTotalPrice();
+                    updateListProducts(inputField);
+                }
+            });
+            function updateTotalPrice() {
+                var totalPrice = 0;
+
+                $(".quant").each(function () {
+                    var quantity = parseInt($(this).val());
+                    var pricePerItem = parseInt($(this).data("price"));
+                    totalPrice += quantity * pricePerItem;
+                });
+                totalPriceMain = totalPrice;
+                $("#total_number_ticket").text(formatCurrency(totalPrice));
+            }
+
+            function formatCurrency(amount) {
+                return amount.toLocaleString('vi-VN');
+            }
+            function updateListProducts(inputField) {
+                var productId = inputField.attr("id").replace("ticket_", "");
+                var quantity = parseInt(inputField.val());
+                var productMainId = parseInt(inputField.data("product-id"));
+
+                var existingProductIndex = listProducts.findIndex(function (item) {
+                    return item.productId === productId;
+                });
+
+                if (quantity > 0) {
+                    if (existingProductIndex === -1) {
+                        listProducts.push
+                        ({
+                                productId: productId, quantity: quantity, productMainID: productMainId
+                        });
+                    } else {
+                        listProducts[existingProductIndex].quantity = quantity;
+                    }
+                } else {
+                    if (existingProductIndex !== -1) {
+                        listProducts.splice(existingProductIndex, 1);
+                    }
+                }
+
+                console.log(listProducts); // You can remove this line, it's for debugging
+            }
+            $("#ladda_button").click(function () {
+                var name = $("#nameDetails").val();
+                var phoneNumber = $('#phoneDetails').val();
+                var email = $('#emailDetails').val();
+                var address = $('#addressDetails').val();
+                if (listProducts.length <= 0){
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: `Vui lòng chọn số lượng vé`,
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+                if (!name || !phoneNumber || !email || !address) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: `Vui lòng nhập đủ thông tin`,
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+                $('#loadingMore').fadeIn();
+
+                const dataVariantsJson = JSON.stringify(listProducts);
+
+                const formData = new FormData();
+                formData.append('Amount', totalPriceMain);
+                formData.append('Name', name);
+                formData.append('PhoneNumber', phoneNumber);
+                formData.append('Email', email);
+                formData.append('OrderType', "Thanh toán VNPAY");
+                formData.append('Address', address);
+                formData.append('ListProducts', dataVariantsJson);
+                axios.post('/payment/create-payment-url', formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }).then(res => {
+                        if (res.data.code === 400) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi',
+                                text: `${res.data.message}`,
+                                confirmButtonText: 'OK'
+                            });
+                            return;
+                        }else{
+                            window.location.href = res.data.url;
+                        }
+
+                    }).finally(() => {
+                        $('#loadingMore').fadeOut();
+
+                    });
+                console.log(totalPriceMain);
+                console.log(listProducts);
+            })
+        })
+        
+
+        
+    </script>
+}

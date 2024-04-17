@@ -275,3 +275,12 @@
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
+
+.img-details{
+    width: 100%;
+    object-fit: contain;
+}
+.items-bottom:not(:last-child) {
+    border-bottom: 1px solid #ccc;
+    padding: 12px 0;
+}

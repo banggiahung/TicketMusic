@@ -35,10 +35,7 @@ namespace TicketMusic.Areas.AdminTicket.Controllers
         [HttpGet("admin/categories")]
         public IActionResult Index()
         {
-            var results = _context.Categories
-                .ToList();
-
-            
+            var results = _context.Categories.OrderByDescending(x=>x.CategoryID).ToList();
             return View(results);
         }
         [HttpGet("admin/categories/edit/{Id}")]
@@ -81,7 +78,7 @@ namespace TicketMusic.Areas.AdminTicket.Controllers
 
         }
         [HttpPost("admin/categories/remove")]
-        public async Task<IActionResult> DeleteProducts(int ID)
+        public async Task<IActionResult> DeleteCategory(int ID)
         {
             try
             {
@@ -96,6 +93,22 @@ namespace TicketMusic.Areas.AdminTicket.Controllers
                 {
                     return Ok(new { code = 400, meesage = "Không xóa danh mục mặc định" });
 
+                }
+
+                List<Products> products =  _context.Products.Where(x => x.CategoryID == existingProduct.CategoryID).ToList();
+                if (products.Any())
+                {
+                    var category = _context.Categories.FirstOrDefault(x => x.IsDefault);
+                    if (category != null)
+                    {
+                        foreach(var product in products)
+                        {
+                            product.CategoryID = category.CategoryID;
+                            _context.Products.Update(product);
+                            _context.SaveChanges();
+
+                        }
+                    }
                 }
                 _context.Categories.Remove(existingProduct);
                 await _context.SaveChangesAsync();
@@ -120,6 +133,11 @@ namespace TicketMusic.Areas.AdminTicket.Controllers
                 if (existingProduct == null)
                 {
                     return Ok(new { code = 400 });
+
+                }
+                if(existingProduct.IsDefault)
+                {
+                    return Ok(new { code = 400, meesage = "Đang là mặc định" });
 
                 }
                 var newCategory = await _context.Categories.FirstOrDefaultAsync(x => x.IsDefault);
@@ -147,53 +165,28 @@ namespace TicketMusic.Areas.AdminTicket.Controllers
         }
 
 
-        [HttpPost("admin/products/update")]
-        public async Task<IActionResult> UpdateProducts(ProductsCRUDViewModel model)
+        [HttpPost("admin/category/update")]
+        public async Task<IActionResult> UpdateProducts(Categories model)
         {
             try
             {
-                var products = _context.Products.FirstOrDefault(x=>x.IDProduct == model.IDProduct);
-                if (products == null)
+                var category = _context.Categories.FirstOrDefault(x=>x.CategoryID == model.CategoryID);
+                if (category == null)
                 {
                     return Ok(new { code = 400, message = "Lỗi" });
 
                 }
-                List<ProductVariantsCRUDEdit> variantsList = JsonConvert.DeserializeObject<List<ProductVariantsCRUDEdit>>(model.Variants);
-                model.UpdateDate = DateTime.Now;
-                if (model.PrPath != null)
-                {
-                    var PrPath = await _iCommon.UploadedFile(model.PrPath);
-                    model.ImageEvent = "/Upload/" + PrPath;
-                }
-                products.Name = model.Name;
-                products.Slug = model.Slug;
-                products.CategoryID = model.CategoryID;
-                products.ShortDescription = model.ShortDescription;
-                products.Description = model.Description;
-                products.TimeEvent = model.TimeEvent;
-                products.Location = model.Location;
-                products.UpdateDate = model.UpdateDate;
-                var existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.Slug == products.Slug && p.IDProduct != products.IDProduct);
+                category.CategoryName = model.CategoryName;
+                category.Slug = model.Slug;
+                category.IsDefault = model.IsDefault;
+               
+                var existingProduct = await _context.Categories.FirstOrDefaultAsync(p => p.Slug == category.Slug && p.CategoryID != category.CategoryID);
                 if (existingProduct != null)
                 {
                     return Ok(new { code = 400, message = "Trùng slug, vui lòng nhập lại" });
 
                 }
-                _context.Products.Update(products);
-                await _context.SaveChangesAsync();
-
-                foreach (var item in variantsList)
-                {
-                    if(item.ProductVariantsID == 0)
-                    {
-                        var variantItem = new ProductVariants();
-                        variantItem.VariantsValue = item.VariantsValue;
-                        variantItem.PriceVariants = item.PriceVariants;
-                        variantItem.ProductID = products.IDProduct;
-                        _context.Add(variantItem);
-                    }
-                   
-                }
+                _context.Categories.Update(category);
                 await _context.SaveChangesAsync();
                 return Ok(new { code = 200, message = "Thành công" });
 

@@ -13,6 +13,8 @@
         public int ViewCount { get; set; }
 
         public string? ImageEvent { get; set; }
+        public bool IsPopular { get; set; }
+
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
 
@@ -34,6 +36,7 @@
                 ViewCount = _Products.ViewCount,
                 ImageEvent = _Products.ImageEvent,
                 UpdateDate = _Products.UpdateDate,
+                IsPopular = _Products.IsPopular,
               
 
             };
@@ -55,6 +58,7 @@
                 ViewCount = vm.ViewCount,
                 ImageEvent = vm.ImageEvent,
                 UpdateDate = vm.UpdateDate,
+                IsPopular = vm.IsPopular,
 
             };
         }

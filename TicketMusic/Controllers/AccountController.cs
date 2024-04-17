@@ -9,6 +9,7 @@ using System.Security.Claims;
 using TicketMusic.Models.AccountVM;
 using TicketMusic.Services;
 using Microsoft.Extensions.Options;
+using System.Data;
 
 namespace ShopBanVe.Controllers
 {
@@ -159,8 +160,29 @@ namespace ShopBanVe.Controllers
                     await _userManager.AddToRoleAsync(user, "Member");
                     // Automatically sign in the user
                     await _signInManager.SignInAsync(user, isPersistent: false);
+                var claims = new List<Claim> {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Role, "Member"),
+                };
 
-                    return Json(new { code = 200, message = "Thành công", section = true });
+                // Xây dựng ClaimsIdentity
+                var claimsIdentity = new ClaimsIdentity(
+                    claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // Thiết lập các thuộc tính xác thực (nếu có)
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = true, // Thiết lập cho phép lưu cookie vĩnh viễn (remember me)
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1), // Thiết lập thời gian hết hạn sau 2 giờ
+                };
+
+
+                // Đăng ký phiên đăng nhập hiện tại vào HttpContext
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    authProperties);
+                return Json(new { code = 200, message = "Thành công", section = true });
                 }
                 foreach (var error in result.Errors)
                 {

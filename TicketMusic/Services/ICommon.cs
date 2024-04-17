@@ -24,6 +24,8 @@ namespace TicketMusic.Services
 
         //void SendEmail(DataUser request);
         //string GenerateToken();
-      
+        List<Categories> GetCategories();
+        string GenerateRandomString(int lenght);
+
     }
 }

@@ -1,4 +1,6 @@
-﻿@{
+﻿@model TicketMusic.Models.ViewHome.ViewHomeIndex
+@using System.Linq;
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -8,9 +10,9 @@
             <img src="~/frontendassets/images/event_gallery-a5fe9b8276f2710cb508ba80309c7b2f.jpg" class="d-block w-100" alt="..." />
         </div>
         <div class="carousel-item">
-             <img src="~/frontendassets/images/event_gallery-b47bd643eb82d88ddff6ba95db24335d.jpg" class="d-block w-100" alt="..." />
+            <img src="~/frontendassets/images/event_gallery-b47bd643eb82d88ddff6ba95db24335d.jpg" class="d-block w-100" alt="..." />
         </div>
-      
+
     </div>
     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -22,5 +24,84 @@
     </button>
 </div>
 <main class="container">
-  
+    <div class="clearfix clearfix-30"></div>
+    <div class="clearfix clearfix-30"></div>
+
+    <h2 class="header-title">SỰ KIỆN NỔI BẬT</h2>
+    <div class="main-content-items">
+        <div class="row">
+            @foreach(var items in Model.ProductsPopular.Take(2))
+            {
+                <div class="col-12 col-md-6 mb-3">
+                    <div class="media_img">
+                        <a href="/event/@items.Slug">
+                            <img class="w-100" src="@items.ImageEvent" alt="@items.Name" title="@items.Name">
+                        </a>
+                    </div>
+                </div>
+            }
+
+            @foreach (var items in Model.ProductsPopular.Skip(2))
+            {
+                <div class="col-12 col-md-3 mb-3">
+                    <div class="media_img">
+                        <a href="/event/@items.Slug">
+                            <img class="w-100" src="@items.ImageEvent" alt="@items.Name" title="@items.Name">
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <h2 class="header-title mt-4">SỰ KIỆN SẮP DIỄN RA</h2>
+    <div class="items-cart cover_list_event">
+        <div class="row">
+            @foreach(var items in Model.ProductsMost)
+            {
+                <div class="col-12 col-md-3">
+                    <div class="cover_list_event">
+                        <div class="event">
+                            <a class="event_image" href="/event/@items.Slug" title="@items.Name">
+                                <img src="@items.ImageEvent" alt="@items.Name" title="@items.Name">
+                            </a>
+                          
+                            <div class="event_date_time">
+                                <div class="event_date_month"> Tháng @items.TimeEvent.Month </div>
+                                <div class="event_date_day"> @items.TimeEvent.Day </div>
+                                <div class="event_date_year"> @items.TimeEvent.Year </div>
+                            </div>
+                            <div class="sub_event">
+                                <div>
+                                    <span class="fa fa-eye"></span>
+                                    @items.ViewCount.ToString("N0")
+                                </div>
+                                <div>
+                                    <span class="fa fa-map-marker"></span>
+                                   @{
+                                        string[] parts = items.Location?.Split(',');
+                                        string lastPart = parts[parts.Length - 1].Trim();
+                                    }
+                                    @lastPart
+                                    <span>+</span>
+                                </div>
+                                <div>
+                                    @{
+                                        decimal minPrice = items.ProductVariants.Min(v => v.PriceVariants);
+                                    }
+                                    <span>VNĐ</span> @minPrice.ToString("N0")
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3>
+                                <a href="/event/@items.Slug" title="@items.Name">@items.Name</a>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            }
+           
+        </div>
+    </div>
+
 </main>

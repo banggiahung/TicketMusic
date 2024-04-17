@@ -14,7 +14,8 @@ namespace Tommava.ViewComponents
         }
         public IViewComponentResult Invoke()
         {
-            return View();
+            var category = _icommom.GetCategories();
+            return View(category);
         }
     }
 }

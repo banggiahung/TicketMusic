@@ -1,4 +1,7 @@
-﻿<header class="header-fix" id="vue_header">
+﻿@using Microsoft.AspNetCore.Http;
+@model List<TicketMusic.Models.Categories>
+
+<header class="header-fix" id="vue_header">
     <div class="container header-top">
         <div class="row">
             <div class="col-4">
@@ -46,12 +49,40 @@
                         </div>
                     </div>
                     <div class="col-md-6 form-login">
-                        <a class="login" href="javascript:void(0)" id="btnLogin">
-                            Đăng nhập
-                        </a>
-                        <a class="register" href="javascript:void(0)" id="btnSignup">
-                            Đăng ký
-                        </a>
+                       
+                        @if (ViewBag.userName != null)
+                        {
+                            <div class="poup-user">
+                                <div class="info-user" id="info-user">
+                                    <div>
+                                        @ViewBag.NameUser 
+                                    </div>
+                                    <div class="img-user">
+                                        <img src="~/upload/avatar/blank_avatar.png" />
+                                    </div>
+                                </div>
+                               
+                                <div class="log-out">
+                                    @if (ViewBag.userName == "ticketadmin")
+                                    {
+                                        <a href="/admin/dashboard" >Admin</a>
+
+                                    }
+                                    <a href="javascript:void(0)" v-on:click="Logout">Đăng xuất</a>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <a class="login" href="javascript:void(0)" id="btnLogin">
+                                Đăng nhập
+                            </a>
+                            <a class="register" href="javascript:void(0)" id="btnSignup">
+                                Đăng ký
+                            </a>
+                        }
+                       
+                       
                     </div>
                 </div>
 
@@ -81,13 +112,20 @@
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Danh mục
                             </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/">Vé ca nhạc</a></li>
-                                <li><a class="dropdown-item" href="/">Văn hóa nghệ thuật</a></li>
-                                <li>
-                                    <a class="dropdown-item" href="/">Vé ca nhạc 2</a>
-                                </li>
-                            </ul>
+                            @if (Model.Any())
+                            {
+                                <ul class="dropdown-menu">
+                                    @foreach(var items in Model)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" href="/event/category/@items.Slug">@items.CategoryName</a>
+                                            </li>
+                                       
+                                    }
+                                   
+                                </ul>
+                            }
+                            
                         </li>
 
                     </ul>

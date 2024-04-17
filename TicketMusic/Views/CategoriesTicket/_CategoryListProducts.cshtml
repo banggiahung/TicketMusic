@@ -1,0 +1,46 @@
+﻿@model List<TicketMusic.Models.Products>
+
+@foreach (var items in Model)
+{
+    <div class="col-12 col-md-3">
+        <div class="cover_list_event">
+            <div class="event">
+                <a class="event_image" href="/event/@items.Slug" title="@items.Name">
+                    <img src="@items.ImageEvent" alt="@items.Name" title="@items.Name">
+                </a>
+
+                <div class="event_date_time">
+                    <div class="event_date_month"> Tháng @items.TimeEvent.Month </div>
+                    <div class="event_date_day"> @items.TimeEvent.Day </div>
+                    <div class="event_date_year"> @items.TimeEvent.Year </div>
+                </div>
+                <div class="sub_event">
+                    <div>
+                        <span class="fa fa-eye"></span>
+                        @items.ViewCount.ToString("N0")
+                    </div>
+                    <div>
+                        <span class="fa fa-map-marker"></span>
+                        @{
+                            string[] parts = items.Location?.Split(',');
+                            string lastPart = parts[parts.Length - 1].Trim();
+                        }
+                        @lastPart
+                        <span>+</span>
+                    </div>
+                    <div>
+                        @{
+                            decimal minPrice = items.ProductVariants.Min(v => v.PriceVariants);
+                        }
+                        <span>VNĐ</span> @minPrice.ToString("N0")
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h3>
+                    <a href="/event/@items.Slug" title="@items.Name">@items.Name</a>
+                </h3>
+            </div>
+        </div>
+    </div>
+}

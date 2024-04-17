@@ -1,0 +1,234 @@
+﻿.box-items {
+    box-shadow: 0 -2px 20px 2px #ccc;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 16px;
+}
+.box-items:first-child {
+   margin-top: 32px;
+}
+#event_name {
+    font-size: 24px;
+    margin: 0;
+    margin-bottom: 12px;
+    margin-top: 7px;
+    font-weight: 700;
+}
+.event_info p {
+    font-size: 20px;
+}
+.event_info i {
+    color: #ff6f35;
+    display: inline-block;
+    width: 30px;
+    float: left;
+}
+.order-button.active:not([disabled]), .order-button:not([disabled]):focus, .order-button:not([disabled]):hover {
+    background: #de551f;
+    -webkit-box-shadow: 0 3px 3px 0 rgba(0,0,0,.14), 0 1px 7px 0 rgba(0,0,0,.12), 0 3px 1px -1px rgba(0,0,0,.2);
+    box-shadow: 0 3px 3px 0 rgba(0,0,0,.14), 0 1px 7px 0 rgba(0,0,0,.12), 0 3px 1px -1px rgba(0,0,0,.2);
+}
+.order-button i {
+    margin-left: 5px;
+}
+.order-button {
+    background: #ff672a;
+    border-color: #ff672a;
+    color: #fff;
+    padding: 10px 0;
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    transition: ease-in-out .2s;
+    font-weight: 700;
+    font-size: 20px;
+    text-transform: uppercase;
+    border-radius: 4px;
+}
+#social_button {
+    margin-top: 8px;
+}
+#contact_support {
+    font-size: 15px;
+    text-align: center;
+    margin-top: 5px;
+}
+    #contact_support p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+.cover_order_fix_bot {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 9999;
+}
+
+.order_fix_bot {
+    display: inline-block;
+    background: #ff672a;
+    border-color: #ff672a;
+    color: #fff;
+    padding: 10px 25px;
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    transition: ease-in-out .2s;
+    font-family: open sans;
+    font-weight: 700;
+    font-size: 18px;
+    text-transform: capitalize;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.ticket_title {
+    text-align: center;
+    color: #ff672a;
+    font-size: 18px;
+    margin: 25px 0;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.ticket_info_box img:not([src]) {
+    display: none;
+}
+
+.ticket_info_box img{
+    width: 100%;
+    height: auto;
+}
+.info-buy {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    color: #fff;
+    background-color: #ff672a;
+    border-color: #ff672a;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    margin-bottom: 12px;
+}
+.value-price{
+    display: flex;
+    align-items: center;
+}
+.info-buy i {
+    margin-right: 8px;
+}
+.info-buy p{
+    margin: 0;
+}
+
+.title-border-left {
+    color: #333;
+    border-left: 5px solid #ff672a;
+    display: inline-block;
+    padding-left: 15px;
+}
+.clearfix-15 {
+    clear: both;
+    height: 15px;
+    width: 100%;
+}
+.accordion{
+    margin-top: 12px;
+}
+.bold{
+    font-weight: 600;
+}
+#buyTicket .modal-body {
+    padding: 2em;
+}
+.form-bordered-order .form-group {
+    margin: 0;
+    border-bottom: 1px solid #efefef;
+}
+    .form-bordered-order .form-group .control-label {
+        padding-top: 20px;
+        text-align: left;
+    }
+    .form-bordered-order .form-group .div-label {
+        padding-top: 20px;
+        padding: 15px;
+        border-left: 1px solid #efefef;
+    }
+.control-label {
+    padding-top: 20px;
+    padding: 15px;
+}
+.input-group-btn {
+    position: relative;
+    font-size: 0;
+    white-space: nowrap;
+}
+    .input-group-btn:first-child > .btn, .input-group-btn:first-child > .btn-group {
+        margin-right: -1px;
+    }
+        .input-group-btn:first-child > .btn {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+.btn-danger {
+    color: #fff;
+    background-color: #d9534f;
+    border-color: #d43f3a;
+}
+.p-30 {
+    padding-top: 20px;
+    padding: 15px;
+    border-left: 1px solid #efefef;
+}
+.orange-color {
+    color: #ff672a;
+}
+
+.ladda-button, .ladda-button .ladda-spinner, .ladda-button .ladda-label {
+    -webkit-transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;
+    -moz-transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;
+    -ms-transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;
+    -o-transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;
+}
+.ladda-button {
+    position: relative;
+}
+.orange-background {
+    background-color: #ff672a !important;
+    border-color: #ff672a !important;
+    color: #fff !important;
+}
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+.login-main{
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+.black-background {
+    background-color: #ccc !important;
+    border-color: #ccc !important;
+    color: #fff !important;
+    cursor: no-drop !important;
+}
+    .black-background:focus {
+        box-shadow: unset !important;
+    }
+.quant[readonly] {
+    background-color: #FFFFFF; 
+   
+}
+    .quant[readonly]:focus {
+        box-shadow: unset !important;
+    }
+
+.text-right {
+    text-align: right;
+}

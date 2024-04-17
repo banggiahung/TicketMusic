@@ -1,0 +1,119 @@
+﻿@model TicketMusic.Models.CategoryViewModel.CategoryViewHome;
+@{
+    ViewData["Title"] = Model.Categories.CategoryName;
+}
+@section Styles{
+    <link href="~/css/category.css" rel="stylesheet" />
+}
+<div class="container">
+    <div class="cover_breadcrumb">
+        <ul class="breadcrumb">
+            <li>
+                <a href="/">Trang chủ</a>
+            </li>
+            <li>
+                <span>@Model.Categories.CategoryName</span>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="content-first hot_event_in_cate">
+    <div class="container">
+        <div class="row">
+            @if (Model.Products.Any())
+            {
+                Products product = Model.Products.Take(1).FirstOrDefault();
+                if (product != null)
+                {
+                    <div class="col-md-6 col-12">
+                        <div class="img_cate_hot_event">
+                            <a href="/event/@product.Slug">
+                                <img class="img-fluid" src="@product.ImageEvent" alt="@product.Name" title="@product.Name">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <div class="sub_event_cate">
+                            <h3>
+                                <a href="/event/@product.Slug">@product.Name</a>
+                            </h3>
+                            <div class="ticket_hot_cate">
+                                <div>
+                                    <span class="fa fa-eye"></span>
+                                    @product.ViewCount
+                                </div>
+                                <div>
+                                    <span class="fa fa-map-marker"></span>
+                                    <span>
+                                        @{
+                                            string[] parts = product.Location?.Split(',');
+                                            string lastPart = parts[parts.Length - 1].Trim();
+                                        }
+                                        @lastPart
+                                    </span>
+                                </div>
+                                <div>
+                                    @{
+                                        decimal minPrice = product.ProductVariants.Min(v => v.PriceVariants);
+                                    }
+                                    <span>VNĐ</span> @minPrice.ToString("N0") +
+                                </div>
+                            </div>
+                            <div class="hot_cate_info">
+                                @product.ShortDescription
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            }
+
+        </div>
+    </div>
+</div>
+<main class="container">
+    <div class="total_events_cate">
+        
+        Tổng số : <b>@Model.CountEvent</b> Sự kiện
+    </div>
+    <div >
+        <div class="row" id="items-category">
+            @Html.Partial("_CategoryListProducts", Model.Products.Skip(1).ToList())
+
+        </div>
+
+    </div>
+    <div class="load_more_event_cate" id="loadMore" data-category="@Model.Categories.CategoryID">
+        <button type="button" class="btn">Tải thêm</button>
+    </div>
+
+</main>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            var page = 2; 
+
+            $('#loadMore').click(function () {
+                var CategoryId = $(this).data('category');
+                var loadMoreButton = $(this);
+                $.ajax({
+                    url: '/event/category/get-more',
+                    type: 'GET',
+                    data: { page: page, CategoryId: CategoryId },
+                    success: function (response) {
+                        if ($(response).length > 0) {
+                            $('#items-category').append(response);
+                            page++; 
+                        } else {
+                            $('#loadMore').hide();
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        });
+    </script>
+}

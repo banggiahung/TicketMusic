@@ -1,0 +1,231 @@
+﻿@model List<TicketMusic.Models.Orders>
+@using System.Text.Json;
+@using Newtonsoft.Json
+
+@{
+    var count = 1;
+}
+
+<div id="vue_orders">
+    <h2 class="text-center mb-4">Quản lý đơn hàng</h2>
+
+    <div>
+        <table id="order_table" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Mã hóa đơn</th>
+                    <th>Tên người mua</th>
+                    <th>Tổng giá trị</th>
+                    <th>Tổng số vé</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var items in Model)
+                {
+                    <tr>
+                        <td>
+                            @(count++)
+                        </td>
+                       <td>
+                           @items.OrderCode
+                       </td>
+                        <td>
+                            @items.Customer_Name
+                        </td>
+                        <td>
+                            @items.TotalPrices.ToString("N0") đ
+                        </td>
+                        <td>
+                            @items.OrdersDetails.Sum(d => d.Quantity)
+                        </td>
+                        <td>
+                            @if(items.OrderStatus)
+                            {
+                                <button type="button" class="btn btn-success">Đã thanh toán</button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-warning">Chờ thanh toán</button>
+
+                            }
+                              
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#detailsModal" v-on:click="orderDetails('@JsonConvert.SerializeObject(items)')">Chi tiết</button>
+                            <button type="button" class="btn btn-danger" >Xóa</button>
+
+                        </td>
+                    </tr>
+                }
+              
+            </tbody>
+        </table>
+    </div>
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-xl ">
+            <div class="modal-content ">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Chi tiết đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">Mã hóa đơn </label>
+                                <input class="form-control" type="text" :value="detailsOrders.OrderCode" readonly>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Người mua</label>
+                                <input class="form-control" type="text" :value="detailsOrders.Customer_Name" readonly />
+                            </div>  
+                            <div class="mb-3">
+                                <label class="form-label">Số điện thoại</label>
+                                <input class="form-control" type="text" :value="detailsOrders.PhoneNumber" readonly />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Địa chỉ</label>
+                                <textarea class="form-control" rows="3" readonly> {{detailsOrders.Address}}</textarea>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">Trạng thái hóa đơn </label>
+                                <input v-if="detailsOrders.OrderStatus" class="form-control" type="text" value="Đã thanh toán" readonly>
+                                <input v-else class="form-control" type="text" value="Chờ thanh toán" readonly>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Ngày khởi tạo</label>
+                                <input class="form-control" type="text" :value="formatDate(new Date(detailsOrders.CreateDate))" readonly />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tổng giá trị</label>
+                                <input class="form-control" type="text" :value="formatCurrency(detailsOrders.TotalPrices)" readonly />
+
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tổng số vé</label>
+                                <input class="form-control" type="text" :value="calculateTotalQuantity" readonly />
+
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <p class="text-center">Chi tiết vé đặt</p>
+                            <div class="border-variants">
+                                <div class="row mb-3 align-items-center items-bottom" v-for="(items,index) in detailsOrders.OrdersDetails " :key="index">
+                                    <div class="col-4">
+                                        <div>
+                                            <img :src="items.Products.ImageEvent" class="img-details" />
+                                        </div>
+                                    </div>
+                                    <div class="col-8">
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <p>Tên vé:</p>
+                                                <p>Loại vé:</p>
+                                                <p>Giá vé:</p>
+                                                <p>Số lượng:</p>
+                                            </div>
+                                            <div class="col-10">
+                                                <p>{{items.Products.Name}}</p>
+                                                <p>{{items.ProductVariants.VariantsValue}}</p>
+                                                <p>{{formatCurrency(items.ProductVariants.PriceVariants)}}</p>
+                                                <p>{{items.Quantity}}</p>
+                                            </div>
+                                        </div>
+                                       
+                                    </div>
+                              
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/lib/config/datatableconfig.js"></script>
+
+<script>
+
+    var vue_orders = new Vue({
+        el: "#vue_orders",
+        data:{
+            detailsOrders: { OrdersDetails: [] }
+        },
+        computed: {
+            calculateTotalQuantity() {
+                return this.detailsOrders.OrdersDetails.reduce((total, item) => total + item.Quantity, 0);
+            }
+        },
+        methods:{
+            orderDetails(items){
+                this.detailsOrders = JSON.parse(items);
+                console.log(this.detailsOrders);
+            },
+            formatCurrency(amount) {
+                const formatter = new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                });
+
+                return formatter.format(amount);
+            },
+            formatDate(date) {
+                const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+                return date.toLocaleDateString('vi-VN', options);
+            },
+            groupProductVariantsByProductId(detailsOrders) {
+                const groupedProductVariants = {};
+
+                // Lặp qua mỗi order detail
+                detailsOrders.forEach(orderDetail => {
+                    const productId = orderDetail.ProductsID;
+
+                    // Kiểm tra xem ProductsID đã tồn tại trong groupedProductVariants chưa
+                    if (groupedProductVariants.hasOwnProperty(productId)) {
+                        // Nếu đã tồn tại, thêm ProductVariant vào mảng tương ứng
+                        groupedProductVariants[productId].push(orderDetail.ProductVariants);
+                    } else {
+                        // Nếu chưa tồn tại, tạo một mảng mới chứa ProductVariant
+                        groupedProductVariants[productId] = [orderDetail.ProductVariants];
+                    }
+                });
+
+                return groupedProductVariants;
+            }
+
+        }
+    });
+    $(document).ready(function () {
+        $('#order_table').DataTable({
+            ...globalConfig.createDataTableConfig(),
+            'columnDefs': [{
+                'targets': [-1],
+                'orderable': false,
+            }],
+            searching: true,
+            iDisplayLength: 7,
+            "ordering": false,
+            lengthChange: false,
+            aaSorting: [[0, "desc"]],
+            aLengthMenu: [
+                [5, 10, 25, 50, 100, -1],
+
+                ["5 dòng", "10 dòng", "25 dòng", "50 dòng", "100 dòng", "Tất cả"],
+            ]
+        });
+    })
+</script>

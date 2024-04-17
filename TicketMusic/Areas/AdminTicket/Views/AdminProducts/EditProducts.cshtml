@@ -4,6 +4,16 @@
 
 <div class="row" id="vue_edit">
     <div class="col-6">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="IsPopular" @if (Model.ProductsEdit.IsPopular)
+            {
+                <text>checked</text>
+            }>
+            <label class="form-check-label" for="flexCheckDefault">
+                Phổ biến
+            </label>
+        </div>
+
         <div class="mb-3">
             <label class="form-label">Tên vé </label>
             <input class="form-control" value="@Model.ProductsEdit.Name" type="text" placeholder="Tên vé" id="Name">
@@ -25,8 +35,7 @@
             <select id="CategoryId" class="form-control">
                 @foreach (var category in Model.CategoriesList)
                 {
-                    var selected = category.CategoryID == Model.ProductsEdit.CategoryID ? "selected" : "";
-                    <option key="@category.CategoryID" value="@category.CategoryID" selected="@selected">
+                    <option key="@category.CategoryID" value="@category.CategoryID" selected="@(category.CategoryID == Model.ProductsEdit.CategoryID)">
                         @category.CategoryName
                     </option>
                 }
@@ -55,7 +64,7 @@
             <div class="border-variants">
 
                 <div class="row" v-for="(items,index) in dataVariants" :key="index">
-                    <div class="col-6">
+                    <div class="col-5">
                         <div class="mb-3">
                             <label class="form-label">Tên biến thể</label>
                             <input class="form-control" type="text" placeholder="Vé trẻ em" v-model="items.VariantsValue">
@@ -65,6 +74,12 @@
                         <div class="mb-3">
                             <label class="form-label">Giá biến thể</label>
                             <input class="form-control" type="text" placeholder="100000" v-model="items.PriceVariants">
+                        </div>
+                    </div>
+                    <div class="col-1">
+                        <div class="mb-3">
+                            <label class="form-label">Số lượng vé</label>
+                            <input class="form-control" type="text" placeholder="1" v-model="items.QuantityTicket">
                         </div>
                     </div>
                     <div class="col-1">
@@ -147,6 +162,8 @@
                     ProductVariantsID: 0,
                     VariantsValue: "Vé",
                     PriceVariants: "10000",
+                    QuantityTicket: 1,
+
                 });
 
             },
@@ -187,10 +204,13 @@
                 const dataVariantsJson = JSON.stringify(this.dataVariants);
                 $('#preloader').fadeIn();
                 try {
+                    const isPopular = $("#IsPopular").prop("checked");
+
                     const formData = new FormData();
                     formData.append('IDProduct', $("#IDProduct").val());
                     formData.append('Name', $("#Name").val());
                     formData.append('Slug', $("#Slug").val());
+                    formData.append('IsPopular', isPopular);
                     formData.append('CategoryId', $('#CategoryId').val());
                     formData.append('ShortDescription', $('#ShortDescription').val());
                     formData.append('Description', editorData);

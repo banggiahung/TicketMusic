@@ -6,6 +6,7 @@ namespace TicketMusic.Models
     {
         [Key]
         public int OrderID { get; set; }
+        public string OrderCode { get; set; }
         public string UserID { get; set; }
         public string Address { get; set; }
         public decimal TotalPrices { get; set; }

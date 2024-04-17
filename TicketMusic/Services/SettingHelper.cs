@@ -1,5 +1,5 @@
 ﻿using TicketMusic.Data;
-
+using TicketMusic.Models;
 
 namespace TicketMusic.Services
 {
@@ -16,6 +16,17 @@ namespace TicketMusic.Services
         {
            
             return "";
+        }
+
+        public ApplicationUser GetUser(string UserId)
+        {
+            var user = _context.Users.FirstOrDefault(x => x.Id == UserId);
+            if (user == null)
+            {
+                return null;
+
+            }
+            return user;
         }
     }
 }

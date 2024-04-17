@@ -358,6 +358,24 @@ namespace TicketMusic.Services
 
 
         //}
+        public  List<Categories> GetCategories()
+        {
+            var categories =  _context.Categories.OrderByDescending(X => X.CategoryID).ToList();
+            return categories;
+        }
+        public string GenerateRandomString(int length)
+        {
+            const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            Random random = new Random();
+            char[] result = new char[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                result[i] = characters[random.Next(characters.Length)];
+            }
+
+            return new string(result);
+        }
     }
 
        
