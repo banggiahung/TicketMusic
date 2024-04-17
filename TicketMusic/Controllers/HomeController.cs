@@ -5,6 +5,7 @@ using System.Diagnostics;
 using TicketMusic.Data;
 using TicketMusic.Models;
 using TicketMusic.Models.AccountVM;
+using TicketMusic.Models.ProductsViewModel;
 using TicketMusic.Models.ViewHome;
 using TicketMusic.Services;
 
@@ -61,8 +62,36 @@ namespace TicketMusic.Controllers
             return View(response);
         }
 
-       
+        [HttpGet("search/ticket")]
+        public IActionResult GetSearch(string search)
+        {
 
+            var products = (from i in _context.Products
+                            where i.Name.Contains(search) 
+                            select new ProductsCRUDViewModel
+                            {
+                                Name = i.Name,
+                                Slug = i.Slug,
+                                CreateDate = i.CreateDate
+                            }).OrderByDescending(i => i.CreateDate);
+            var result = products.Select(ToDictionaryWithNonNullProperties).ToList();
+            return Ok(result);
+        }
+        public static IDictionary<string, object> ToDictionaryWithNonNullProperties<T>(T obj)
+        {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+
+            var dictionary = new Dictionary<string, object>();
+            foreach (var property in typeof(T).GetProperties())
+            {
+                var value = property.GetValue(obj);
+                if (value != null)
+                {
+                    dictionary.Add(property.Name, value);
+                }
+            }
+            return dictionary;
+        }
         public IActionResult Privacy()
         {
             return View();

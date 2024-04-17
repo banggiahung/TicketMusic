@@ -671,6 +671,7 @@ span.color_orange {
             text-overflow: ellipsis;
             white-space: normal;
             -webkit-line-clamp: 2;
+
         }
 
         .cover_list_event .event .sub_event div span {
@@ -703,6 +704,13 @@ span.color_orange {
     margin-top: 10px;
     margin-bottom: 20px;
     line-height: 20px;
+}
+.items-search {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
 }
 
     .cover_list_event h3 a {
@@ -883,12 +891,17 @@ span.color_orange {
 .monserrat-font {
     letter-spacing: 2px;
 }
+.log-out {
+    min-width: 8em;
+    z-index: 99;
+}
+.items-user-click{
+    padding: 8px 0;
+}
 
 
-
-
-    @media (min-width: 768px) {
-        html {
+@media (min-width: 768px) {
+    html {
         font-size: 16px;
     }
 }

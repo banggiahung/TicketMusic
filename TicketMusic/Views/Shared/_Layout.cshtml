@@ -71,6 +71,52 @@
                     $('.log-out').fadeOut();
                 }
             });
+            $("#myMenu").empty();
+
+            $(".searchTerm").on("input", function () {
+                var searchQuery = $(this).val();
+                if (searchQuery.length >= 2) {
+
+                    $.ajax({
+                        type: "GET",
+                        url: "/search/ticket",
+                        data: { search: searchQuery },
+                        dataType: "json",
+                        success: function (data) {
+                            displaySearchResults(data);
+                        },
+                        error: function () {
+                            console.log("Lỗi trong quá trình tìm kiếm.");
+                        }
+                    });
+                } else {
+
+                    $("#myMenu").empty();
+                    $("#showSearch").hide();
+
+                }
+            });
+            function displaySearchResults(data) {
+                $("#showSearch").show();
+
+                var recordCount = data.length;
+                $("#myMenu").empty();
+
+                for (var i = 0; i < data.length; i++) {
+                    var resultItem = data[i];
+                    console.log(resultItem);
+
+                    var priceToShow = resultItem.PriceDiscount !== 0 ? resultItem.PriceDiscount : resultItem.Price;
+
+                    var resultHtml = 
+                        '<a href="/event/' + resultItem.Slug + '">' +
+                        '<p class="items-search">' + resultItem.Name + '</p>' +
+                        '</a>';
+                       
+
+                    $("#myMenu").append(resultHtml);
+                }
+            }
         })
        
     </script>
